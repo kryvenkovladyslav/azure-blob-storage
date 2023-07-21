@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Abstract.Models
+namespace IdentityDataAccessLayer.Models
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>
     {
         public virtual string FirstName { get; set; }
 
         public virtual string LastName { get; set; }
 
-        public virtual ICollection<ApplicationUserRole> Roles { get; set; }
+        public virtual ICollection<UserRole> Roles { get; set; }
     }
 }
