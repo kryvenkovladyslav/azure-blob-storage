@@ -1,8 +1,8 @@
 ﻿namespace Abstract.Options.IdentitySystemOptions
 {
-    public sealed class DefaultIdentitySytemOptions
+    public sealed class DefaultIdentitySystemOptions
     {
-        public static string Position { get; private set; } = nameof(DefaultIdentitySytemOptions);
+        public static string Position { get; private set; } = nameof(DefaultIdentitySystemOptions);
 
         public DefaultIdentityUserOptions UserOptions { get; set; }
 

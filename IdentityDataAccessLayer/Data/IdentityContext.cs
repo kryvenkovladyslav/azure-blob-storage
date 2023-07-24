@@ -1,4 +1,4 @@
-﻿using Abstract.Options;
+﻿using Abstract.Options.ConnectionOptions;
 using IdentityDataAccessLayer.Configuration;
 using IdentityDataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
@@ -12,9 +12,9 @@ namespace IdentityDataAccessLayer.Data
     public class IdentityContext 
         : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
-        private readonly DefaultConnectionStringsOptions options;
+        private readonly DefaultConnectionIdentityDatabaseOptions options;
 
-        public IdentityContext(IOptions<DefaultConnectionStringsOptions> options) 
+        public IdentityContext(IOptions<DefaultConnectionIdentityDatabaseOptions> options) 
         {
             this.options = options.Value;
         }

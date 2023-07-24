@@ -7,9 +7,9 @@ namespace Abstract.Options.OptionsSetup
 {
     public sealed class IdentitySystemOptionsSetup : IConfigureNamedOptions<IdentityOptions>
     {
-        private readonly DefaultIdentitySytemOptions sytemOptions;
+        private readonly DefaultIdentitySystemOptions sytemOptions;
 
-        public IdentitySystemOptionsSetup(IOptions<DefaultIdentitySytemOptions> sytemOptions)
+        public IdentitySystemOptionsSetup(IOptions<DefaultIdentitySystemOptions> sytemOptions)
         {
             this.sytemOptions = sytemOptions.Value;
         }
@@ -24,7 +24,7 @@ namespace Abstract.Options.OptionsSetup
 
         public void Configure(IdentityOptions options)
         {
-            this.Configure(nameof(DefaultIdentitySytemOptions), options);
+            this.Configure(nameof(DefaultIdentitySystemOptions), options);
         }
 
         private void ConfigureUserOptions(IdentityOptions options, DefaultIdentityUserOptions userOptions) 
