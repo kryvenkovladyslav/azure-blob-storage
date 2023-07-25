@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace AzureBlobStorage.Abstract
 {
-    internal interface IAzureBlobStorageService
+    public interface IAzureBlobStorageService
     {
         public Task<string> UploadAsync(IUploadRequestModel requestModel, CancellationToken token = default);
 

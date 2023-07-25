@@ -1,12 +1,12 @@
-﻿using IdentityDataAccessLayer.Models;
+﻿using Abstract.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IdentityDataAccessLayer.Configuration
 {
-    public sealed class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
+    public sealed class UserRoleConfiguration : IEntityTypeConfiguration<ApplicationUserRole>
     {
-        public void Configure(EntityTypeBuilder<UserRole> builder)
+        public void Configure(EntityTypeBuilder<ApplicationUserRole> builder)
         {
             builder.HasOne(ur => ur.Role).WithMany(r => r.Users)
                .HasForeignKey(ur => ur.RoleId).HasPrincipalKey(r => r.Id);

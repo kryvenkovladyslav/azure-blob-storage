@@ -1,4 +1,7 @@
-﻿namespace Abstract.Options
+﻿using Abstract.Common;
+using System.Collections.Generic;
+
+namespace Abstract.Options.SeedDatabaseOptions
 {
     public sealed class DefaultSeedUserOptions
     {
@@ -13,5 +16,7 @@
         public string Email { get; set; }
 
         public string Password { get; set; }
+
+        public ICollection<ApplicationRoles> Roles { get; set; }
     }
 }

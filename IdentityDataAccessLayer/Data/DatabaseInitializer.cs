@@ -1,10 +1,11 @@
 ﻿using Abstract.Common;
-using Abstract.Options;
-using IdentityDataAccessLayer.Models;
+using Abstract.Models;
+using Abstract.Options.SeedDatabaseOptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
@@ -14,29 +15,32 @@ namespace IdentityDataAccessLayer.Data
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            var roleManager = serviceProvider.GetService<RoleManager<Role>>();
+            var roleManager = serviceProvider.GetService<RoleManager<ApplicationRole>>();
 
             if (roleManager.Roles.Count() == 0)
             {
                 SeedApplicationRolesWithClaims(roleManager);
             }
 
-            var userManager = serviceProvider.GetService<UserManager<User>>();
-            var seedUserOptions = serviceProvider.GetRequiredService<IOptions<DefaultSeedUserOptions>>().Value;
+            var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
+            var databaseSeed = serviceProvider.GetRequiredService<IOptions<DefaultSeedIdentityDatabaseOptions>>().Value;
 
-            if (userManager.FindByNameAsync(seedUserOptions.UserName).GetAwaiter().GetResult() == null)
+            databaseSeed.Users.ToList().ForEach(user =>
             {
-                SeedApplicationUserWithClaims(userManager, seedUserOptions);
-            }
+                if (userManager.FindByNameAsync(user.UserName).GetAwaiter().GetResult() == null)
+                {
+                    SeedApplicationUserWithClaims(userManager, user);
+                }
+            });
         }
 
-        private static void SeedApplicationRolesWithClaims(RoleManager<Role> roleManager)
+        private static void SeedApplicationRolesWithClaims(RoleManager<ApplicationRole> roleManager)
         {
             var roleNames = Enum.GetNames(typeof(ApplicationRoles));
 
             foreach (var name in roleNames)
             {
-                var role = new Role { Name = name };
+                var role = new ApplicationRole { Name = name };
                 var userRoleCreation = roleManager.CreateAsync(role).GetAwaiter().GetResult();
 
                 if (userRoleCreation.Succeeded)
@@ -46,9 +50,9 @@ namespace IdentityDataAccessLayer.Data
             }
         }
 
-        private static void SeedApplicationUserWithClaims(UserManager<User> userManager, DefaultSeedUserOptions options)
+        private static void SeedApplicationUserWithClaims(UserManager<ApplicationUser> userManager, DefaultSeedUserOptions options)
         {
-            var applicationUser = new User
+            var applicationUser = new ApplicationUser
             {
                 FirstName = options.FirstName,
                 LastName = options.LastName,
@@ -60,11 +64,11 @@ namespace IdentityDataAccessLayer.Data
 
             if (creationUserResult.Succeeded)
             {
-                ApplyClaimsRoles(userManager, applicationUser, ApplicationRoles.Administrator, ApplicationRoles.Developer);
+                ApplyClaimsRoles(userManager, applicationUser, options.Roles);
             }
         }
 
-        private static void ApplyClaimsRoles(UserManager<User> userManager, User user, params ApplicationRoles[] roles)
+        private static void ApplyClaimsRoles(UserManager<ApplicationUser> userManager, ApplicationUser user, ICollection<ApplicationRoles> roles)
         {
             roles.ToList().ForEach(role =>
             {
