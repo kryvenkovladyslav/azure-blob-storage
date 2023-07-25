@@ -1,6 +1,6 @@
-﻿using Abstract.Options.ConnectionOptions;
+﻿using Abstract.Models;
+using Abstract.Options.ConnectionOptions;
 using IdentityDataAccessLayer.Configuration;
-using IdentityDataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ using System;
 namespace IdentityDataAccessLayer.Data
 {
     public class IdentityContext 
-        : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
+        : IdentityDbContext<ApplicationUser, ApplicationRole, Guid, IdentityUserClaim<Guid>, ApplicationUserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         private readonly DefaultConnectionIdentityDatabaseOptions options;
 

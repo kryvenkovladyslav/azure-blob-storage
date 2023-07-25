@@ -1,5 +1,5 @@
-﻿using IdentityDataAccessLayer.Data;
-using IdentityDataAccessLayer.Models;
+﻿using Abstract.Models;
+using IdentityDataAccessLayer.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +11,7 @@ namespace IdentityDataAccessLayer.Extensions
         {
             services.AddDbContext<IdentityContext>();
 
-            services.AddIdentity<User, Role>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
 
