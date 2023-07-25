@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abstract", "Abstract\Abstra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityDataAccessLayer", "IdentityDataAccessLayer\IdentityDataAccessLayer.csproj", "{F395477E-EEA9-43CB-B748-EDAE36395226}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureBlobStorage", "AzureBlobStorage\AzureBlobStorage.csproj", "{EA0F6DA0-0C93-4B43-9105-5E41DD4C8857}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F395477E-EEA9-43CB-B748-EDAE36395226}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F395477E-EEA9-43CB-B748-EDAE36395226}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F395477E-EEA9-43CB-B748-EDAE36395226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0F6DA0-0C93-4B43-9105-5E41DD4C8857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0F6DA0-0C93-4B43-9105-5E41DD4C8857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0F6DA0-0C93-4B43-9105-5E41DD4C8857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0F6DA0-0C93-4B43-9105-5E41DD4C8857}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
