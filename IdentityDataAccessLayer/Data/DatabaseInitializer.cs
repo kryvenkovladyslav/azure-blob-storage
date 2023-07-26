@@ -40,7 +40,7 @@ namespace IdentityDataAccessLayer.Data
 
             foreach (var name in roleNames)
             {
-                var role = new ApplicationRole { Name = name };
+                var role = new ApplicationRole(name);
                 var userRoleCreation = roleManager.CreateAsync(role).GetAwaiter().GetResult();
 
                 if (userRoleCreation.Succeeded)

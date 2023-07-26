@@ -1,0 +1,75 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register an account";
+}
+
+<style>
+    .input-validation-error {
+        border: 1px red solid
+    }
+</style>
+
+<section class="container d-flex min-vh-100 justify-content-center align-items-center">
+    <div class="border border-5 border-dark rounded p-3">
+        <div class="p-4 p-md-5">
+            <h3 class="text-center mb-4">REGISTRATION</h3>
+            <form asp-controller="Account" asp-action="Register" asp-antiforgery="true" method="post">
+                <div class="form-group text-center">
+                    <div id="@nameof(Model.FirstName)-validation" class="text-center text-danger mb-1"><span asp-validation-for="FirstName"></span></div>
+                    <label asp-for="FirstName"></label>
+                    <input onchange="handleOnChange(event)" asp-for="FirstName" type="text" class="form-control rounded-left mb-3" placeholder="Patrick" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <div id="@nameof(Model.LastName)-validation" class="text-center text-danger mb-1"><span asp-validation-for="LastName"></span></div>
+                    <label asp-for="LastName"></label>
+                    <input onchange="handleOnChange(event)" asp-for="LastName" type="text" class="form-control rounded-left mb-3" placeholder="Bateman" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <div id="@nameof(Model.UserName)-validation" class="text-center text-danger mb-1"><span asp-validation-for="UserName"></span></div>
+                    <label asp-for="UserName"></label>
+                    <input onchange="handleOnChange(event)" asp-for="UserName" type="text" class="form-control rounded-left mb-3" placeholder="patbateman123" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <div id="@nameof(Model.Email)-validation" class="text-center text-danger mb-1"><span asp-validation-for="Email"></span></div>
+                    <label asp-for="Email"></label>
+                    <input onchange="handleOnChange(event)" asp-for="Email" type="email" class="form-control rounded-left mb-3" placeholder="pat123bateman@gmail.com" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <div id="@nameof(Model.Password)-validation" class="text-center text-danger mb-1"><span asp-validation-for="Password"></span></div>
+                    <label asp-for="Password"></label>
+                    <input onchange="handleOnChange(event)" asp-for="Password" type="password" class="form-control rounded-left mb-3" placeholder="*************" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <button type="submit" class="form-control btn btn-outline-success rounded submit px-3 mb-2">Save</button>
+                    <a asp-action="Login"
+                       asp-controller="Account"
+                       type="submit"
+                       class="form-control btn btn-outline-danger rounded submit px-3">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts
+{
+    <script type="text/javascript" language="javascript">
+
+        function handleOnChange(event) {
+            console.log(event);
+            event.target.classList.remove("input-validation-error");
+            const element = document.getElementById(event.target.id + "-validation");
+            console.log(element);
+            element.remove();
+
+        }
+    </script>
+}  
