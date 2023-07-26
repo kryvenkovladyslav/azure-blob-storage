@@ -1,8 +1,6 @@
-using System;
-
-namespace WebApplication.Models
+namespace WebApplication.Models.ViewModels
 {
-    public class ErrorViewModel
+    public sealed class ErrorViewModel
     {
         public string RequestId { get; set; }
 

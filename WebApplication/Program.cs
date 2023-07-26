@@ -1,4 +1,6 @@
+using IdentityDataAccessLayer.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace WebApplication
@@ -7,7 +9,14 @@ namespace WebApplication
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var builder = CreateHostBuilder(args).Build();
+
+            using (var scope = builder.Services.CreateScope())
+            {
+                DatabaseInitializer.Initialize(scope.ServiceProvider);
+            }
+
+            builder.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

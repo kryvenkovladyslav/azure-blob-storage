@@ -1,22 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using WebApplication.Models;
+using System.Security.Claims;
+using WebApplication.Models.ViewModels;
 
 namespace WebApplication.Controllers
 {
+    [Authorize(Policy = ClaimTypes.Role)]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+        public HomeController()
+        { }
 
         public IActionResult Index()
         {
