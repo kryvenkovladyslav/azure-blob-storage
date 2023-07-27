@@ -63,7 +63,6 @@ namespace WebApplication.Controllers
 
             if (signInResult.Succeeded)
             {
-
                 return this.Redirect(userModel.ReturnUrl ?? new PathString($"/Home/Index"));
             }
 

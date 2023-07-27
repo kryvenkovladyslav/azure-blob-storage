@@ -11,6 +11,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Abstract\Abstract.csproj" />
+    <ProjectReference Include="..\AzureBlobStorage\AzureBlobStorage.csproj" />
     <ProjectReference Include="..\DependencyInjection\DependencyInjection.csproj" />
   </ItemGroup>
 

@@ -29,18 +29,17 @@ namespace AzureBlobStorage.Implementation
 
             var blobClient = containerClient.GetBlobClient(requestModel.File.Name);
 
-            using var context = requestModel.File.OpenReadStream();
+            using var context = requestModel.File.Stream;
 
             var uploadResult = await blobClient.UploadAsync(context, requestModel.OverrideExistingNamesFiles, token);
 
             return blobClient.Uri.OriginalString;
         }
 
-        public virtual async Task<IEnumerable<string>> GetBlobsAsync(IFileRequestModel requestModel, CancellationToken token = default)
+        public virtual async Task<IEnumerable<AzureFileInfo>> GetBlobsAsync(IFileRequestModel requestModel, CancellationToken token = default)
         {
-            var fullyQualifiedUris = new List<string>();
+            var files = new List<AzureFileInfo>();
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
-
 
             var sharedAccessSignature = containerClient.GenerateSasUri(new BlobSasBuilder
             {
@@ -52,10 +51,10 @@ namespace AzureBlobStorage.Implementation
             await foreach (var blob in containerClient.GetBlobsAsync(cancellationToken: token))
             {
                 blobClient = containerClient.GetBlobClient(blob.Name);
-                fullyQualifiedUris.Add(string.Concat(blobClient.Uri.OriginalString, sharedAccessSignature.Query));
+                files.Add(new AzureFileInfo(string.Concat(blobClient.Uri.OriginalString, sharedAccessSignature.Query), blobClient.Name));
             }
 
-            return fullyQualifiedUris;
+            return files;
         }
 
         public virtual async Task<bool> DeleteAsync(IRemoveRequestModel requestModel, CancellationToken token = default)

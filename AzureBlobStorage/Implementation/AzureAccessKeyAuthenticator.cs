@@ -2,7 +2,6 @@
 using AzureBlobStorage.Abstract;
 using AzureBlobStorage.Options.ConfigurationOptions;
 using Microsoft.Extensions.Options;
-using System;
 
 namespace AzureBlobStorage.Implementation
 {
@@ -20,7 +19,7 @@ namespace AzureBlobStorage.Implementation
         {
             if (this.client == null)
             {
-                this.client = new BlobServiceClient(new Uri(this.options.ConnectionString));
+                this.client = new BlobServiceClient(this.options.ConnectionString);
             }
 
             return this.client;

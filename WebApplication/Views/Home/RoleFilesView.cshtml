@@ -1,9 +1,7 @@
 ﻿@model IEnumerable<FileViewModel>
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Role Container";
 }
-
-
 
 <partial name="RoleFileForm" model="new ContainerSelectionViewModel()" />
 
@@ -17,12 +15,12 @@
                             <img class="card-img-top img-thumbnail" src="@image.FullyQualifiedUri" alt="..." />
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
                                 <div>
-                                    <a asp-action="Delete"
-                                       asp-controller="Home"
-                                       asp-route-containerName="@image.ContainerName"
-                                       asp-route-imageName="@image.Name"
-                                       class="text-center btn btn-outline-danger mt-auto">
-                                        Delete
+                                    <a 
+                                        asp-action="Delete"
+                                        asp-controller="Home"
+                                        asp-route-containerName="@image.ContainerName" 
+                                        asp-route-imageName="@image.Name" 
+                                        class="text-center btn btn-outline-danger mt-auto">Delete
                                     </a>
                                 </div>
                             </div>
@@ -32,7 +30,3 @@
             </div>
         </section>
     </section>
-
-
-<partial name="Form" model="new UploadFileViewModel()" />
-

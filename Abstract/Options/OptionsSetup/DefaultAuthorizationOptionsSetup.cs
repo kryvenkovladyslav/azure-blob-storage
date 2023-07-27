@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace ServerIdentity.Abstract.SetupOptions
 {
-    public class DefaultAuthorizationOptionsSetup : IConfigureNamedOptions<AuthorizationOptions>
+    public sealed class DefaultAuthorizationOptionsSetup : IConfigureNamedOptions<AuthorizationOptions>
     {
         public void Configure(string name, AuthorizationOptions options)
         {

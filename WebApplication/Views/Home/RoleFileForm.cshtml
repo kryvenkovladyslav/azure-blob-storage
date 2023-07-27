@@ -1,0 +1,18 @@
+﻿@model ContainerSelectionViewModel
+
+<section class="mb-2">
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <form asp-controller="Home" asp-action="RoleFilesView" method="post" asp-antiforgery="true" enctype="multipart/form-data">
+                    <select asp-for="ContainerName">
+                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.User))">User</option>
+                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Developer))">Developer</option>
+                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Administrator))">Administrator</option>
+                    </select>
+                    <button type="submit">Get Files</button>
+                </form>
+            </tr>
+        </thead>
+    </table>
+</section>
