@@ -1,16 +1,14 @@
-﻿@model IEnumerable<FileViewModel>
+﻿@model ContainerFilesViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
 
-
-
 <partial name="RoleFileForm" model="new ContainerSelectionViewModel()" />
 
     <section>
-        <section class="container px-4 px-lg-5 mt-5">
+        <section class="container px-4 px-lg-5 mt-2">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                @foreach (var image in Model)
+                @foreach (var image in Model.Files)
                 {
                     <div class="col mb-5">
                         <div class="card h-100">
@@ -19,7 +17,7 @@
                                 <div>
                                     <a asp-action="Delete"
                                        asp-controller="Home"
-                                       asp-route-containerName="@image.ContainerName"
+                                       asp-route-containerName="@Model.ContainerName"
                                        asp-route-imageName="@image.Name"
                                        class="text-center btn btn-outline-danger mt-auto">
                                         Delete
@@ -32,7 +30,3 @@
             </div>
         </section>
     </section>
-
-
-<partial name="Form" model="new UploadFileViewModel()" />
-

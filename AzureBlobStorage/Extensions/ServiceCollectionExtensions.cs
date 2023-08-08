@@ -13,7 +13,17 @@ namespace AzureBlobStorage.Extensions
             services.TryAddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
             services.TryAddSingleton<IAzureContainerConfigurationManager, AzureContainerConfigurationManager>();
 
+            ConfigureStorage(services);
+
             return services;
+        }
+
+        private static void ConfigureStorage(IServiceCollection services)
+        {
+            services
+                .BuildServiceProvider()
+                .GetRequiredService<IAzureContainerConfigurationManager>()
+                .Configure();
         }
     }
 }

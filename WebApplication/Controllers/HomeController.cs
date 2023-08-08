@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using WebApplication.Infrastructure.Common;
 using WebApplication.Models.RequestModels;
 using WebApplication.Models.ViewModels;
 
@@ -23,49 +24,58 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var roleClaim = this.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).FirstOrDefault();
-            var containerName = string.Concat(roleClaim.ToLower(), "-images");
+            var roleClaim = this.GetUserRoleClaim();
+            var containerName = string.Concat(roleClaim.ToLower(), UrlConstants.ImagePostfix);
 
             var requestModel = new AzureFileRequestModel
             {
                 UserRolePolicy = roleClaim,
                 ContainerName = containerName
             };
-
             var images = (await this.blobService.GetBlobsAsync(requestModel))
                 .Select(img => new FileViewModel
                 {
-                    ContainerName = containerName,
                     FullyQualifiedUri = img.FullyQualifiedUri,
                     Name = img.Name,
                 });
 
-            return this.View(nameof(this.Index), images);
+            var containerFiles = new ContainerFilesViewModel
+            {
+                ContainerName = containerName,
+                Files = images
+            };
+
+
+            return this.View(nameof(this.Index), containerFiles);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RoleFilesView(ContainerSelectionViewModel viewModel)
         {
-            var roleClaim = this.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).FirstOrDefault();
-            var containerName = string.Concat(viewModel.ContainerName.ToLower(), "-images");
+            var containerName = string.Concat(viewModel.ContainerName.ToLower(), UrlConstants.ImagePostfix);
 
             var requestModel = new AzureFileRequestModel
             {
-                UserRolePolicy = roleClaim,
-                ContainerName = string.Concat(viewModel.ContainerName.ToLower(), "-images")
+                UserRolePolicy = this.GetUserRoleClaim(),
+                ContainerName = containerName
             };
 
             var images = (await this.blobService.GetBlobsAsync(requestModel))
                 .Select(img => new FileViewModel
                 {
-                    ContainerName = containerName,
                     FullyQualifiedUri = img.FullyQualifiedUri,
                     Name = img.Name,
                 });
 
+            var containerFiles = new ContainerFilesViewModel
+            {
+                ContainerName = containerName,
+                Files = images
+            };
 
-            return this.View(nameof(this.RoleFilesView), images);
+
+            return this.View(nameof(this.RoleFilesView), containerFiles);
         }
 
         [HttpPost]
@@ -77,14 +87,14 @@ namespace WebApplication.Controllers
                 Name = fileViewModel.File.FileName,
                 Stream = fileViewModel.File.OpenReadStream()
             };
-            var roleClaim = this.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).FirstOrDefault();
+            var roleClaim = this.GetUserRoleClaim();
 
             var uri = await this.blobService.UploadAsync(new AzureFileUploadRequestModel
             {
                 File = file,
-                ContainerName = string.Concat(roleClaim.ToLower(), "-images"),
+                ContainerName = fileViewModel.RoleContainer ?? string.Concat(roleClaim.ToLower(), UrlConstants.ImagePostfix),
                 OverrideExistingNamesFiles = true,
-                UserRolePolicy = this.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).FirstOrDefault()
+                UserRolePolicy = roleClaim
             });
 
             return this.RedirectToAction(nameof(this.Index));
@@ -95,11 +105,20 @@ namespace WebApplication.Controllers
         {
             await this.blobService.DeleteAsync(new AzureRemoveFileRequestModel
             {
+                UserRolePolicy = this.GetUserRoleClaim(),
                 ContainerName = containerName,
                 FileName = imageName
             });
 
             return this.RedirectToAction(nameof(this.Index));
+        }
+
+        private string GetUserRoleClaim()
+        {
+            return this.User.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .FirstOrDefault();
         }
     }
 }

@@ -1,18 +1,21 @@
 ﻿@model ContainerSelectionViewModel
 
-<section class="mb-2">
+<section>
     <table class="table table-bordered text-center">
         <thead>
             <tr>
                 <form asp-controller="Home" asp-action="RoleFilesView" method="post" asp-antiforgery="true" enctype="multipart/form-data">
-                    <select asp-for="ContainerName">
-                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.User))">User</option>
-                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Developer))">Developer</option>
-                        <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Administrator))">Administrator</option>
-                    </select>
-                    <button type="submit">Get Files</button>
+                    <div class="d-flex">
+                        <select asp-for="ContainerName" class="form-control">
+                            <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.User))">User</option>
+                            <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Developer))">Developer</option>
+                            <option value="@(Enum.GetName<ApplicationRoles>(ApplicationRoles.Administrator))">Administrator</option>
+                        </select>
+                        <button class="text-center mt-3 form-control btn btn-outline-dark mt-auto" type="submit">Get Images</button>
+                    </div>
                 </form>
             </tr>
         </thead>
     </table>
+    <partial name="Form" model="new UploadFileViewModel { RoleContainer = Model.ContainerName }" />
 </section>

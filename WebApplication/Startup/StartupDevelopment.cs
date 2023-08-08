@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using WebApplication.Infrastructure.Extensions;
+using WebApplication.Infrastructure.Middleware;
 
 namespace WebApplication.Startup
 {
@@ -34,6 +35,8 @@ namespace WebApplication.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //app.UseMiddleware<ExceptionHandler>();
+
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

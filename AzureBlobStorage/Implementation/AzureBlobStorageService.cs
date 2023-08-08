@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Azure.Storage.Sas;
 using Azure.Storage.Blobs.Models;
+using AzureBlobStorage.Common;
 
 namespace AzureBlobStorage.Implementation
 {
@@ -27,7 +28,12 @@ namespace AzureBlobStorage.Implementation
         {
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
 
-            var blobClient = containerClient.GetBlobClient(requestModel.File.Name);
+            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
+            var originlaUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, requestModel.ContainerName, "/", requestModel.File.Name);
+
+            var secretUri = new Uri(string.Concat(originlaUri, sharedAccessSignature.Query));
+
+            var blobClient = new BlobClient(secretUri);//containerClient.GetBlobClient(requestModel.File.Name);
 
             using var context = requestModel.File.Stream;
 
@@ -41,11 +47,7 @@ namespace AzureBlobStorage.Implementation
             var files = new List<AzureFileInfo>();
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
 
-            var sharedAccessSignature = containerClient.GenerateSasUri(new BlobSasBuilder
-            {
-                BlobContainerName = requestModel.ContainerName,
-                Identifier = requestModel.UserRolePolicy
-            });
+            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
 
             BlobClient blobClient;
             await foreach (var blob in containerClient.GetBlobsAsync(cancellationToken: token))
@@ -61,10 +63,33 @@ namespace AzureBlobStorage.Implementation
         {
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
 
-            return await containerClient.DeleteBlobIfExistsAsync(
-                requestModel.FileName,
-                DeleteSnapshotsOption.IncludeSnapshots,
-                cancellationToken: token);
+            var originlaUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, requestModel.ContainerName, "/", requestModel.FileName);
+            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
+            var secretUri = new Uri(string.Concat(originlaUri, sharedAccessSignature.Query));
+
+            try
+            {
+                var blobClient = new BlobClient(secretUri);
+
+                return await blobClient.DeleteIfExistsAsync(
+                    DeleteSnapshotsOption.IncludeSnapshots,
+                    cancellationToken: token);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+
+        }
+
+        private Uri GenerateSharedAccessSignature(BlobContainerClient client, string containerName, string identifier) 
+        {
+            return client.GenerateSasUri(new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                Identifier = identifier
+            });
         }
     }
 }

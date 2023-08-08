@@ -4,8 +4,6 @@
     {
         public string FullyQualifiedUri { get; set; }
 
-        public string ContainerName { get; set; }
-
         public string Name { get; set; }
     }
 }
