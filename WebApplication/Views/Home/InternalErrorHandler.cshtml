@@ -1,0 +1,12 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Error";
+}
+
+<section>
+    <h1 class="text-danger"><code>An internal error occurred.</code></h1><hr />
+    <h2 class="text-danger">@Model</h2>
+    <h3 class="mt-4">
+        <a asp-action="Index" asp-controller="Home" class="form-control btn btn-outline-dark rounded submit px-3">Back to Home</a>
+    </h3>
+</section>

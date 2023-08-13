@@ -1,0 +1,53 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register an account";
+}
+
+<style>
+    ul li { list-style: none }
+</style>
+
+<div class="container text-center text-danger list-sty text-decoration-none bg-light" asp-validation-summary="All"></div>
+<section class="container d-flex min-vh-100 justify-content-center align-items-center">
+    <div class="border border-5 border-dark rounded p-3">
+        <div class="p-4 p-md-5">
+            <h3 class="text-center mb-4">REGISTRATION</h3>
+            <form asp-controller="Account" asp-action="Register" asp-antiforgery="true" method="post">
+                <div class="form-group text-center">
+                    <label asp-for="FirstName"></label>
+                    <input asp-for="FirstName" type="text" class="form-control rounded-left mb-3" placeholder="Patrick" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <label asp-for="LastName"></label>
+                    <input asp-for="LastName" type="text" class="form-control rounded-left mb-3" placeholder="Bateman" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <label asp-for="UserName"></label>
+                    <input asp-for="UserName" type="text" class="form-control rounded-left mb-3" placeholder="patbateman123" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" type="email" class="form-control rounded-left mb-3" placeholder="pat123bateman@gmail.com" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" type="password" class="form-control rounded-left mb-3" placeholder="*************" />
+                </div>
+
+                <div class="form-group text-center m-2">
+                    <button type="submit" class="form-control btn btn-outline-success rounded submit px-3 mb-2">Save</button>
+                    <a asp-action="Login"
+                       asp-controller="Account"
+                       type="submit"
+                       class="form-control btn btn-outline-danger rounded submit px-3">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,32 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    ul li { list-style: none }
+</style>
+
+<div class="container text-center text-danger list-sty text-decoration-none bg-light" asp-validation-summary="All"></div>
+<section class="container d-flex min-vh-100 justify-content-center align-items-center bg-light">
+    <div class="border border-5 border-dark rounded p-2">
+        <div class="login-wrap p-md-5">
+            <h3 class="text-center mb-4">LOGIN</h3>
+            <form class="login-form" asp-controller="Account" asp-action="Login" asp-antiforgery="true" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div class="form-group">
+                    <input asp-for="UserName" type="text" class="form-control rounded-left mb-3" placeholder="Username" />
+                </div>
+                <div class="form-group">
+                    <input asp-for="Password" type="password" class="input form-control rounded-left mb-3" placeholder="Password" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="form-control btn btn-outline-dark rounded submit px-3">Login</button>
+                </div>
+            </form>
+            <div class="form-group">
+                <a asp-action="Register" asp-controller="Account" class="form-control btn btn-outline-dark rounded submit px-3">Register an Account</a>
+            </div>
+        </div>
+    </div>
+</section>
