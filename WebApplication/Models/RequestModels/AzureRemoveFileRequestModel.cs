@@ -7,6 +7,7 @@ namespace WebApplication.Models.RequestModels
         public string FileName { get; set; }
 
         public string ContainerName { get; set; }
+
         public string UserRolePolicy { get; set; }
     }
 }

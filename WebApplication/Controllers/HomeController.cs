@@ -45,7 +45,6 @@ namespace WebApplication.Controllers
                 Files = images
             };
 
-
             return this.View(nameof(this.Index), containerFiles);
         }
 
@@ -74,7 +73,6 @@ namespace WebApplication.Controllers
                 Files = images
             };
 
-
             return this.View(nameof(this.RoleFilesView), containerFiles);
         }
 
@@ -82,6 +80,11 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(UploadFileViewModel fileViewModel)
         {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(nameof(this.InternalErrorHandler), ApplicationErrors.ProvideFileError);
+            }
+
             var file = new AzureFile
             {
                 Name = fileViewModel.File.FileName,
@@ -111,6 +114,12 @@ namespace WebApplication.Controllers
             });
 
             return this.RedirectToAction(nameof(this.Index));
+        }
+
+        [HttpGet]
+        public IActionResult InternalErrorHandler()
+        {
+            return this.View(nameof(this.InternalErrorHandler));
         }
 
         private string GetUserRoleClaim()

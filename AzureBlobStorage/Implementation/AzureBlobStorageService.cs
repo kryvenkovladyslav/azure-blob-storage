@@ -26,14 +26,9 @@ namespace AzureBlobStorage.Implementation
 
         public virtual async Task<string> UploadAsync(IUploadRequestModel requestModel, CancellationToken token = default)
         {
-            var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
+            var secretUri = this.GenerateSecretUri(requestModel.ContainerName, requestModel.File.Name, requestModel.UserRolePolicy);
 
-            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
-            var originlaUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, requestModel.ContainerName, "/", requestModel.File.Name);
-
-            var secretUri = new Uri(string.Concat(originlaUri, sharedAccessSignature.Query));
-
-            var blobClient = new BlobClient(secretUri);//containerClient.GetBlobClient(requestModel.File.Name);
+            var blobClient = this.GetBlobClient(secretUri);
 
             using var context = requestModel.File.Stream;
 
@@ -42,12 +37,13 @@ namespace AzureBlobStorage.Implementation
             return blobClient.Uri.OriginalString;
         }
 
-        public virtual async Task<IEnumerable<AzureFileInfo>> GetBlobsAsync(IFileRequestModel requestModel, CancellationToken token = default)
+        public virtual async Task<IEnumerable<AzureFileInfo>> GetBlobsAsync(IFilePolicy requestModel, CancellationToken token = default)
         {
             var files = new List<AzureFileInfo>();
+
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
 
-            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
+            var sharedAccessSignature = this.GenerateSharedAccessSignature(requestModel.ContainerName, requestModel.UserRolePolicy);
 
             BlobClient blobClient;
             await foreach (var blob in containerClient.GetBlobsAsync(cancellationToken: token))
@@ -61,35 +57,35 @@ namespace AzureBlobStorage.Implementation
 
         public virtual async Task<bool> DeleteAsync(IRemoveRequestModel requestModel, CancellationToken token = default)
         {
-            var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
-
-            var originlaUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, requestModel.ContainerName, "/", requestModel.FileName);
-            var sharedAccessSignature = this.GenerateSharedAccessSignature(containerClient, requestModel.ContainerName, requestModel.UserRolePolicy);
-            var secretUri = new Uri(string.Concat(originlaUri, sharedAccessSignature.Query));
-
-            try
-            {
-                var blobClient = new BlobClient(secretUri);
-
-                return await blobClient.DeleteIfExistsAsync(
-                    DeleteSnapshotsOption.IncludeSnapshots,
-                    cancellationToken: token);
-            }
-            catch (Exception e)
-            {
-
-                throw e;
-            }
-
+            var secretUri = this.GenerateSecretUri(requestModel.ContainerName, requestModel.FileName, requestModel.UserRolePolicy);
+            
+            var blobClient = this.GetBlobClient(secretUri);
+            
+            return await blobClient.DeleteIfExistsAsync(
+                DeleteSnapshotsOption.IncludeSnapshots,
+                cancellationToken: token);
         }
 
-        private Uri GenerateSharedAccessSignature(BlobContainerClient client, string containerName, string identifier) 
+        private BlobClient GetBlobClient(Uri secret)
         {
-            return client.GenerateSasUri(new BlobSasBuilder
+            return new BlobClient(secret);
+        }
+
+        private Uri GenerateSharedAccessSignature(string containerName, string identifier) 
+        {
+            var containerClient = this.client.GetBlobContainerClient(containerName);
+
+            return containerClient.GenerateSasUri(new BlobSasBuilder
             {
                 BlobContainerName = containerName,
                 Identifier = identifier
             });
+        }
+
+        private Uri GenerateSecretUri(string containerName, string fileName, string userPolicy)
+        {
+            var originalUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, containerName, "/", fileName);
+            return new Uri(string.Concat(originalUri, this.GenerateSharedAccessSignature(containerName, userPolicy).Query));
         }
     }
 }

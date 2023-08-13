@@ -10,7 +10,6 @@ using AutoMapper;
 using WebApplication.Infrastructure.Extensions;
 using WebApplication.Infrastructure.Common;
 using Abstract.Common;
-using System.Security.Claims;
 
 namespace WebApplication.Controllers
 {
@@ -63,7 +62,7 @@ namespace WebApplication.Controllers
 
             if (signInResult.Succeeded)
             {
-                return this.Redirect(userModel.ReturnUrl ?? new PathString($"/Home/Index"));
+                return this.Redirect(userModel.ReturnUrl ?? new PathString(UrlConstants.HomeUri));
             }
 
             this.AddErrorToModelState(IdentityErrors.InvalidPassword());
@@ -105,7 +104,7 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = ClaimTypes.Role)]
+        [Authorize]
         public async Task<IActionResult> Logout(string logoutId)
         {
             await this.authenticationService.LogoutAsync();

@@ -1,6 +1,6 @@
 ﻿namespace AzureBlobStorage.Abstract
 {
-    public interface IFileRequestModel : IRequestModel
+    public interface IFilePolicy : IFileContainer
     {
         public string UserRolePolicy { get; set; }
     }

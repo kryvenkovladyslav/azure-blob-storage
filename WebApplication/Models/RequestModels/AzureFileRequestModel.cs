@@ -2,7 +2,7 @@
 
 namespace WebApplication.Models.RequestModels
 {
-    public sealed class AzureFileRequestModel : IFileRequestModel
+    public sealed class AzureFileRequestModel : IFilePolicy
     {
         public string UserRolePolicy { get; set; }
 

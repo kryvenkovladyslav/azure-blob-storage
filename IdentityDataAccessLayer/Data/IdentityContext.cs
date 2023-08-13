@@ -14,6 +14,8 @@ namespace IdentityDataAccessLayer.Data
     {
         private readonly DefaultConnectionIdentityDatabaseOptions options;
 
+        public IdentityContext() { }
+
         public IdentityContext(IOptions<DefaultConnectionIdentityDatabaseOptions> options) 
         {
             this.options = options.Value;

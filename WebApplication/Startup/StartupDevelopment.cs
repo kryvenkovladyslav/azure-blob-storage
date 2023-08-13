@@ -35,9 +35,8 @@ namespace WebApplication.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //app.UseMiddleware<ExceptionHandler>();
+            app.UseMiddleware<ExceptionHandler>();
 
-            app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -51,6 +50,8 @@ namespace WebApplication.Startup
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapFallbackToController("InternalErrorHandler", "Home");
             });
         }
     }
