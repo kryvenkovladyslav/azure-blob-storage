@@ -1,15 +1,12 @@
-﻿using Abstract.Options.ConnectionOptions;
-using Abstract.Options.IdentitySystemOptions;
-using Abstract.Options.OptionsSetup;
-using Abstract.Options.SeedDatabaseOptions;
+﻿using AzureBlobStorage.Extensions;
 using DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ServerIdentity.Abstract.SetupOptions;
 using System;
 using WebApplication.Infrastructure.Extensions;
+using WebApplication.Infrastructure.Middleware;
 
 namespace WebApplication.Startup
 {
@@ -24,15 +21,10 @@ namespace WebApplication.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<DefaultConnectionIdentityDatabaseOptions>(this.Configuration.GetSection(DefaultConnectionIdentityDatabaseOptions.Position));
-            services.Configure<DefaultIdentitySystemOptions>(this.Configuration.GetSection(DefaultIdentitySystemOptions.Position));
-            services.Configure<DefaultSeedIdentityDatabaseOptions>(this.Configuration.GetSection(DefaultSeedIdentityDatabaseOptions.Position));
-            services.ConfigureOptions<IdentitySystemOptionsSetup>();
-            services.ConfigureOptions<DefaultAuthenticationOptionsSetup>();
-            services.ConfigureOptions<DefaultAuthorizationOptionsSetup>();
-
-            services.AddApplicationBusinessSerivces();
+            services.ConfigureApplicationOptions(this.Configuration);
             services.AddApplicationIdentityDataAccessLayer();
+            services.AddApplicationBusinessSerivces();
+            services.AddAzureBlobStorage();
             services.AddMappingProfiles();
 
             services.AddAuthentication();
@@ -43,7 +35,8 @@ namespace WebApplication.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseDeveloperExceptionPage();
+            app.UseMiddleware<ExceptionHandler>();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -57,6 +50,8 @@ namespace WebApplication.Startup
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapFallbackToController("InternalErrorHandler", "Home");
             });
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace AzureBlobStorage.Abstract
 {
-    public interface IRequestModel
+    public interface IFileContainer
     {
         public string ContainerName { get; }
     }

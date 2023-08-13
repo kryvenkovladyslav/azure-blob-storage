@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Azure.Storage.Sas;
 using Azure.Storage.Blobs.Models;
+using AzureBlobStorage.Common;
 
 namespace AzureBlobStorage.Implementation
 {
@@ -25,47 +26,66 @@ namespace AzureBlobStorage.Implementation
 
         public virtual async Task<string> UploadAsync(IUploadRequestModel requestModel, CancellationToken token = default)
         {
-            var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
+            var secretUri = this.GenerateSecretUri(requestModel.ContainerName, requestModel.File.Name, requestModel.UserRolePolicy);
 
-            var blobClient = containerClient.GetBlobClient(requestModel.File.Name);
+            var blobClient = this.GetBlobClient(secretUri);
 
-            using var context = requestModel.File.OpenReadStream();
+            using var context = requestModel.File.Stream;
 
             var uploadResult = await blobClient.UploadAsync(context, requestModel.OverrideExistingNamesFiles, token);
 
             return blobClient.Uri.OriginalString;
         }
 
-        public virtual async Task<IEnumerable<string>> GetBlobsAsync(IFileRequestModel requestModel, CancellationToken token = default)
+        public virtual async Task<IEnumerable<AzureFileInfo>> GetBlobsAsync(IFilePolicy requestModel, CancellationToken token = default)
         {
-            var fullyQualifiedUris = new List<string>();
+            var files = new List<AzureFileInfo>();
+
             var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
 
-
-            var sharedAccessSignature = containerClient.GenerateSasUri(new BlobSasBuilder
-            {
-                BlobContainerName = requestModel.ContainerName,
-                Identifier = requestModel.UserRolePolicy
-            });
+            var sharedAccessSignature = this.GenerateSharedAccessSignature(requestModel.ContainerName, requestModel.UserRolePolicy);
 
             BlobClient blobClient;
             await foreach (var blob in containerClient.GetBlobsAsync(cancellationToken: token))
             {
                 blobClient = containerClient.GetBlobClient(blob.Name);
-                fullyQualifiedUris.Add(string.Concat(blobClient.Uri.OriginalString, sharedAccessSignature.Query));
+                files.Add(new AzureFileInfo(string.Concat(blobClient.Uri.OriginalString, sharedAccessSignature.Query), blobClient.Name));
             }
 
-            return fullyQualifiedUris;
+            return files;
         }
 
         public virtual async Task<bool> DeleteAsync(IRemoveRequestModel requestModel, CancellationToken token = default)
         {
-            var containerClient = this.client.GetBlobContainerClient(requestModel.ContainerName);
-
-            return await containerClient.DeleteBlobIfExistsAsync(
-                requestModel.FileName,
+            var secretUri = this.GenerateSecretUri(requestModel.ContainerName, requestModel.FileName, requestModel.UserRolePolicy);
+            
+            var blobClient = this.GetBlobClient(secretUri);
+            
+            return await blobClient.DeleteIfExistsAsync(
                 DeleteSnapshotsOption.IncludeSnapshots,
                 cancellationToken: token);
+        }
+
+        private BlobClient GetBlobClient(Uri secret)
+        {
+            return new BlobClient(secret);
+        }
+
+        private Uri GenerateSharedAccessSignature(string containerName, string identifier) 
+        {
+            var containerClient = this.client.GetBlobContainerClient(containerName);
+
+            return containerClient.GenerateSasUri(new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                Identifier = identifier
+            });
+        }
+
+        private Uri GenerateSecretUri(string containerName, string fileName, string userPolicy)
+        {
+            var originalUri = string.Concat(AzureBlobStorageAccountConstants.FullyQualifiedBlobUri, containerName, "/", fileName);
+            return new Uri(string.Concat(originalUri, this.GenerateSharedAccessSignature(containerName, userPolicy).Query));
         }
     }
 }

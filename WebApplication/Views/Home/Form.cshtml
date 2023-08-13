@@ -1,0 +1,19 @@
+﻿@model UploadFileViewModel
+
+<section class="mb-2">
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <form asp-controller="Home" asp-action="Upload" method="post" asp-antiforgery="true" enctype="multipart/form-data">
+                    <th>
+                        <input asp-for="File" type="file" class="mt-2" multiple>
+                        <input asp-for="RoleContainer" type="hidden" />
+                    </th>
+                    <th>
+                        <button class ="text-center btn btn-outline-success mt-auto" type="submit">Upload new image</button>
+                    </th>
+                </form>
+            </tr>
+        </thead>
+    </table>
+</section>

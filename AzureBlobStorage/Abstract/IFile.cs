@@ -6,6 +6,6 @@ namespace AzureBlobStorage.Abstract
     {
         public string Name { get; }
 
-        public Stream OpenReadStream();
+        public Stream Stream { get; set; }
     }
 }

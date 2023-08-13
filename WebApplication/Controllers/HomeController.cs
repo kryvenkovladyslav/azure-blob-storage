@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AzureBlobStorage.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using System;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using WebApplication.Infrastructure.Common;
+using WebApplication.Models.RequestModels;
 using WebApplication.Models.ViewModels;
 
 namespace WebApplication.Controllers
@@ -9,23 +14,120 @@ namespace WebApplication.Controllers
     [Authorize(Policy = ClaimTypes.Role)]
     public class HomeController : Controller
     {
-        public HomeController()
-        { }
+        private readonly IAzureBlobStorageService blobService;
 
-        public IActionResult Index()
+        public HomeController(IAzureBlobStorageService blobService)
         {
-            return View();
+            this.blobService = blobService ?? throw new ArgumentNullException(nameof(blobService));
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var roleClaim = this.GetUserRoleClaim();
+            var containerName = string.Concat(roleClaim.ToLower(), UrlConstants.ImagePostfix);
+
+            var requestModel = new AzureFileRequestModel
+            {
+                UserRolePolicy = roleClaim,
+                ContainerName = containerName
+            };
+            var images = (await this.blobService.GetBlobsAsync(requestModel))
+                .Select(img => new FileViewModel
+                {
+                    FullyQualifiedUri = img.FullyQualifiedUri,
+                    Name = img.Name,
+                });
+
+            var containerFiles = new ContainerFilesViewModel
+            {
+                ContainerName = containerName,
+                Files = images
+            };
+
+            return this.View(nameof(this.Index), containerFiles);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RoleFilesView(ContainerSelectionViewModel viewModel)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var containerName = string.Concat(viewModel.ContainerName.ToLower(), UrlConstants.ImagePostfix);
+
+            var requestModel = new AzureFileRequestModel
+            {
+                UserRolePolicy = this.GetUserRoleClaim(),
+                ContainerName = containerName
+            };
+
+            var images = (await this.blobService.GetBlobsAsync(requestModel))
+                .Select(img => new FileViewModel
+                {
+                    FullyQualifiedUri = img.FullyQualifiedUri,
+                    Name = img.Name,
+                });
+
+            var containerFiles = new ContainerFilesViewModel
+            {
+                ContainerName = containerName,
+                Files = images
+            };
+
+            return this.View(nameof(this.RoleFilesView), containerFiles);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Upload(UploadFileViewModel fileViewModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(nameof(this.InternalErrorHandler), ApplicationErrors.ProvideFileError);
+            }
+
+            var file = new AzureFile
+            {
+                Name = fileViewModel.File.FileName,
+                Stream = fileViewModel.File.OpenReadStream()
+            };
+            var roleClaim = this.GetUserRoleClaim();
+
+            var uri = await this.blobService.UploadAsync(new AzureFileUploadRequestModel
+            {
+                File = file,
+                ContainerName = fileViewModel.RoleContainer ?? string.Concat(roleClaim.ToLower(), UrlConstants.ImagePostfix),
+                OverrideExistingNamesFiles = true,
+                UserRolePolicy = roleClaim
+            });
+
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(string containerName, string imageName)
+        {
+            await this.blobService.DeleteAsync(new AzureRemoveFileRequestModel
+            {
+                UserRolePolicy = this.GetUserRoleClaim(),
+                ContainerName = containerName,
+                FileName = imageName
+            });
+
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        [HttpGet]
+        public IActionResult InternalErrorHandler()
+        {
+            return this.View(nameof(this.InternalErrorHandler));
+        }
+
+        private string GetUserRoleClaim()
+        {
+            return this.User.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .FirstOrDefault();
         }
     }
 }
